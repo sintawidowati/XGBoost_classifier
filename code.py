@@ -1,25 +1,11 @@
-import sys
-import collections
-import random
-import math
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 import pandas as pd
-import psutil
 import pickle
 import optuna
-import uuid
-import time
 import warnings
-import seaborn as sns
-from datetime import datetime
-from collections import defaultdict
-from operator import itemgetter
-from pprint import pprint
-from os import listdir, path
 from tqdm import tqdm
-from random import shuffle
 
 
 # For Machine learning =========================================
@@ -33,7 +19,6 @@ from sklearn.model_selection import KFold
 
 
 # XGBoost ==============================
-import xgboost as xgb
 from xgboost import XGBClassifier
 np.set_printoptions(precision=3)
 warnings.simplefilter('ignore')
