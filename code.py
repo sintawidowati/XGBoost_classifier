@@ -34,9 +34,8 @@ from xgboost import XGBClassifier
 np.set_printoptions(precision=3)
 warnings.simplefilter('ignore')
 # Set Path2Corpus =========================
-#path_to_base = 'C:/Users/Ary Prasetiyo/Desktop/sintha_xgb'
-path_to_base = 'C:/Users/GE/Desktop/sintha_xgb'
-version = '201910140000'
+path_to_base = `PATH_TO_BASE_DIRECTORY'
+version = 'INPUT_YOUR_VERSION'
 os.chdir(path_to_base)
 
 # Set variables ==============================
@@ -89,7 +88,6 @@ def opt_xgb(trial):
     subsample = trial.suggest_discrete_uniform('subsample', 0.5, 0.9, 0.1)
     colsample_bytree = trial.suggest_discrete_uniform('colsample_bytree', 0.5, 0.9, 0.1)
     xgboost_tuna = XGBClassifier(
-#        num_class = 2,
         objective = 'binary:logistic',
         random_state=42,
         nthread = 8,
@@ -114,31 +112,13 @@ def top_n_accuracy(preds, truths, n, class_names):
     return float(successes)/ts.shape[0]
 
 
-
 # XGBoost =========================================
 # Model and DataFrame construction ========================
-#df_plain = pd.read_csv('normfulldata05gt04.csv')
-#drop_col = ['datanum', 'FID_1', 'pointid']
+df_plain = pd.read_csv('PATH_TO_DATAFRAME_2005')
+'''
+This dataframe has four column (explain the column name that are used
+'''
 
-#Data training for res-20191113-resampled-bin>>>old
-#df_plain = pd.read_csv('new_res2019_bin.csv')
-#drop_col = ['keyid', 'cellid', 'gt']
-
-#drop_col = ['key_id', 'fid', 'gt']
-#drop_col = ['key_id', 'fid', 'urbin']
-
-#Data training for res-2019.....-resampleddata-bin
-df_plain = pd.read_csv('norm_resfull05.csv')
-drop_col = ['FID_1', 'pointid', 'gt']
-
-
-#Data training for res-20191118-fulldata-bin
-df_plain = pd.read_csv('norm_orifull05.csv')
-drop_col = ['FID_1', 'pointid', 'gt','bqa']
-
-df = df_plain.drop(drop_col, axis=1)
-#pkl_saver('df.binaryfile', df)
-#df = pkl_loader('df.binaryfile')
 
 # Cross Validation Loop ========================
 param_names = np.array(['n_estimators','max_depth','min_child_weight','subsample','colsample_bytree']).reshape(1,-1)
@@ -200,17 +180,16 @@ for outer_cv in tqdm(range(0, cvs)):
 # Saving results =======================================
 save_result(cv_results, class_names, eval)
 
-#Join the result with dropped columns for resampled bin data 2005
-#df_result2005 = pd.read_csv('xgb_results_list770.csv')
-df_classifres2005bin = pd.DataFrame(pd.np.column_stack([cv_results, df_plain]))
-df_classifres2005bin.columns = ['id', 'obs', 'pred', 'U_prob', 'NU_prob',  'FID_1', 'pointid', 'gt', 'urbin','b2', 'b3', 'b4', 'b5']
-df_classifres2005bin.to_csv('df_classifres2005bin.csv')
 
 #Join the result with dropped columns for full bin data 2005
 #df_result2005 = pd.read_csv('xgb_results_list770.csv')
 df_classifull2005bin = pd.DataFrame(pd.np.column_stack([cv_results, df_plain]))
 df_classifull2005bin.columns = ['id', 'obs', 'pred', 'U_prob', 'NU_prob',  'keyid', 'cellid', 'gt', 'urbin','bqa','b2', 'b3', 'b4', 'b5']
 df_classifull2005bin.to_csv('df_classifull2005bin.csv')
+'''
+We concatenated the groundtruth and predicted result to check the accuracy performance for each pixel with the code line 
+'''
+
 
 # XGB Best_model_training ========================
 mean_best_params = {name: param for name, param in zip(param_names[0], np.mean(test_params_memory, axis=0))}
@@ -230,66 +209,35 @@ best_xgboost.fit(X_best_train, y_best_train)
 pkl_saver('xgb_bestmodel.binaryfile', best_xgboost)
 best_xgboost = pkl_loader('xgb_bestmodel.binaryfile')
 
+
 # For Predict unknown dataset of 2005 ________________
-df_test2005 = pd.read_csv('norm_cumprob05.csv')
-drop_col = ['FID_1', 'pointid']
-X_test2005 = df_test2005.drop(drop_col, axis=1)
+X_test2005 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME2005')
 y_pred2005 = best_xgboost.predict(X_test2005)
 y_pred2005smx = best_xgboost.predict_proba(X_test2005)
 
-#for 2005 prediction with resampled-bin classifier
-df_pred2005res = pd.DataFrame(pd.np.column_stack([y_pred2005, y_pred2005smx, df_test2005]))
-df_pred2005res.columns = ['urbin_pred', 'U_prob', 'NU_prob', 'FID_1', 'pointid', 'b2', 'b3', 'b4', 'b5']
-df_pred2005res.to_csv('df_pred2005res.csv')
 
 #for 2005 prediction with orifull-bin classifier
-df_pred2005ori = pd.DataFrame(pd.np.column_stack([y_pred2005, y_pred2005smx, df_test2005]))
-df_pred2005ori.columns = ['urbin_pred', 'U_prob', 'NU_prob', 'FID_1', 'pointid', 'b2', 'b3', 'b4', 'b5']
+df_pred2005ori = pd.DataFrame(pd.np.column_stack([y_pred2005, y_pred2005smx, X_test2005]))
 df_pred2005ori.to_csv('df_pred2005ori.csv')
 
+
 # For Predict unknown dataset of 1999 ________________
-df_test1999 = pd.read_csv('normcumprob_val99.csv')
-drop_col = ['FID_1', 'pointid']
-X_test1999 = df_test1999.drop(drop_col, axis=1)
+X_test1999 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME1999')
 y_pred1999 = best_xgboost.predict(X_test1999)
 y_pred1999smx = best_xgboost.predict_proba(X_test1999)
 
-#for 1999 prediction with resampled-bin classifier
-df_pred1999res = pd.DataFrame(pd.np.column_stack([y_pred1999, y_pred1999smx, df_test1999]))
-df_pred1999res.columns = ['urbin_pred', 'U_prob', 'NU_prob', 'FID_1', 'pointid', 'b2', 'b3', 'b4', 'b5']
-df_pred1999res.to_csv('df_pred1999res.csv')
 
 #for 1999 prediction with orifull-bin classifier
-df_pred1999ori = pd.DataFrame(pd.np.column_stack([y_pred1999, y_pred1999smx, df_test1999]))
-df_pred1999ori.columns = ['urbin_pred', 'U_prob', 'NU_prob', 'FID_1', 'pointid', 'b2', 'b3', 'b4', 'b5']
+df_pred1999ori = pd.DataFrame(pd.np.column_stack([y_pred1999, y_pred1999smx, X_test1999]))
 df_pred1999ori.to_csv('df_pred1999ori.csv')
 
+
 # For Predict unknown dataset of 2011 ________________
-df_test2011 = pd.read_csv('normcumprob_val11.csv')
-drop_col = ['FID_1', 'pointid']
-X_test2011 = df_test2011.drop(drop_col, axis=1)
+X_test2011 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME2011')
 y_pred2011 = best_xgboost.predict(X_test2011)
 y_pred2011smx = best_xgboost.predict_proba(X_test2011)
 
-#for 2011 prediction with resampled-bin classifier
-df_pred2011res = pd.DataFrame(pd.np.column_stack([y_pred2011, y_pred2011smx, df_test2011]))
-df_pred2011res.columns = ['urbin_pred', 'U_prob', 'NU_prob', 'FID_1', 'pointid', 'b2', 'b3', 'b4', 'b5']
-df_pred2011res.to_csv('df_pred2011res.csv')
 
 #for 2011 prediction with orifull-bin classifier
-df_pred2011ori = pd.DataFrame(pd.np.column_stack([y_pred2011, y_pred2011smx, df_test2011]))
-df_pred2011ori.columns = ['urbin_pred', 'U_prob', 'NU_prob', 'FID_1', 'pointid', 'b2', 'b3', 'b4', 'b5']
+df_pred2011ori = pd.DataFrame(pd.np.column_stack([y_pred2011, y_pred2011smx, X_test2011]))
 df_pred2011ori.to_csv('df_pred2011ori.csv')
-
-
-# For Predict unknown dataset of 2009 ________________
-df_test2009 = pd.read_csv('normcumprob_val09.csv')
-drop_col = ['FID_1', 'pointid']
-X_test2009 = df_test2009.drop(drop_col, axis=1)
-y_pred2009 = best_xgboost.predict(X_test2009)
-y_pred2009smx = best_xgboost.predict_proba(X_test2009)
-
-#for 2009 prediction with orifull-bin classifier
-df_pred2009ori = pd.DataFrame(pd.np.column_stack([y_pred2009, y_pred2009smx, df_test2009]))
-df_pred2009ori.columns = ['urbin_pred', 'U_prob', 'NU_prob', 'FID_1', 'pointid', 'b2', 'b3', 'b4', 'b5']
-df_pred2009ori.to_csv('df_pred2009ori.csv')
