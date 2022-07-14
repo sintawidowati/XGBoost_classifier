@@ -9,13 +9,9 @@ from tqdm import tqdm
 
 
 # For Machine learning =========================================
-from sklearn.datasets import fetch_mldata
-from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score, f1_score
-from sklearn.model_selection import cross_val_score, GridSearchCV
-from sklearn.model_selection import KFold
 
 
 # XGBoost ==============================
