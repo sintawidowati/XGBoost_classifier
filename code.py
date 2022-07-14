@@ -20,6 +20,8 @@ from pprint import pprint
 from os import listdir, path
 from tqdm import tqdm
 from random import shuffle
+
+
 # For Machine learning =========================================
 from sklearn.datasets import fetch_mldata
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
@@ -28,15 +30,20 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import cross_val_score, GridSearchCV
 from sklearn.model_selection import KFold
+
+
 # XGBoost ==============================
 import xgboost as xgb
 from xgboost import XGBClassifier
 np.set_printoptions(precision=3)
 warnings.simplefilter('ignore')
+
+
 # Set Path2Corpus =========================
 path_to_base = `PATH_TO_BASE_DIRECTORY'
 version = 'INPUT_YOUR_VERSION'
 os.chdir(path_to_base)
+
 
 # Set variables ==============================
 class_names = np.array(['U','NU'])
