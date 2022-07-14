@@ -123,7 +123,9 @@ def top_n_accuracy(preds, truths, n, class_names):
 # Model and DataFrame construction ========================
 df_plain = pd.read_csv('PATH_TO_DATAFRAME_2005')
 '''
-This dataframe has four column (explain the column name that are used
+This dataframe has 5 columns which are 'urbin','b2','b3','b4', and 'b5' sequentially. 
+First column, 'urbin', contained the binary land cover type which are U and NU from the ground truth data. 
+The next 4 columns contained the DNs of each pixel in band 2, band 3, band 4, and band 5 extracted from LANDSAT 5TM 2005. 
 '''
 
 
@@ -184,17 +186,18 @@ for outer_cv in tqdm(range(0, cvs)):
     print('mean_top1_accuracy:' + str(np.mean(val_top1_accuracies)))
     print('mean_top3_accuracy:' + str(np.mean(val_top3_accuracies)))
     eval = str(np.mean(val_top1_accuracies))[2:4] + str(np.mean(val_top3_accuracies))[2:4]
+    
+    
 # Saving results =======================================
 save_result(cv_results, class_names, eval)
 
 
 #Join the result with dropped columns for full bin data 2005
-#df_result2005 = pd.read_csv('xgb_results_list770.csv')
 df_classifull2005bin = pd.DataFrame(pd.np.column_stack([cv_results, df_plain]))
 df_classifull2005bin.columns = ['id', 'obs', 'pred', 'U_prob', 'NU_prob',  'keyid', 'cellid', 'gt', 'urbin','bqa','b2', 'b3', 'b4', 'b5']
 df_classifull2005bin.to_csv('df_classifull2005bin.csv')
 '''
-We concatenated the groundtruth and predicted result to check the accuracy performance for each pixel with the code line 
+We concatenated the main dataframe and predicted result to check the accuracy performance for each pixel as shown in code line 197
 '''
 
 
@@ -213,38 +216,39 @@ X_best_train = df.drop(['urbin'], axis=1)
 y_best_train = df['urbin']
 best_xgboost.fit(X_best_train, y_best_train)
 
+
 pkl_saver('xgb_bestmodel.binaryfile', best_xgboost)
 best_xgboost = pkl_loader('xgb_bestmodel.binaryfile')
 
 
-# For Predict unknown dataset of 2005 ________________
+#for predict unknown dataset of 2005 ________________
 X_test2005 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME2005')
 y_pred2005 = best_xgboost.predict(X_test2005)
 y_pred2005smx = best_xgboost.predict_proba(X_test2005)
 
 
-#for 2005 prediction with orifull-bin classifier
+#for 2005 prediction with best model
 df_pred2005ori = pd.DataFrame(pd.np.column_stack([y_pred2005, y_pred2005smx, X_test2005]))
 df_pred2005ori.to_csv('df_pred2005ori.csv')
 
 
-# For Predict unknown dataset of 1999 ________________
+#for predict unknown dataset of 1999 ________________
 X_test1999 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME1999')
 y_pred1999 = best_xgboost.predict(X_test1999)
 y_pred1999smx = best_xgboost.predict_proba(X_test1999)
 
 
-#for 1999 prediction with orifull-bin classifier
+#for 1999 prediction with best model
 df_pred1999ori = pd.DataFrame(pd.np.column_stack([y_pred1999, y_pred1999smx, X_test1999]))
 df_pred1999ori.to_csv('df_pred1999ori.csv')
 
 
-# For Predict unknown dataset of 2011 ________________
+#for predict unknown dataset of 2011 ________________
 X_test2011 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME2011')
 y_pred2011 = best_xgboost.predict(X_test2011)
 y_pred2011smx = best_xgboost.predict_proba(X_test2011)
 
 
-#for 2011 prediction with orifull-bin classifier
+#for 2011 prediction with best model
 df_pred2011ori = pd.DataFrame(pd.np.column_stack([y_pred2011, y_pred2011smx, X_test2011]))
 df_pred2011ori.to_csv('df_pred2011ori.csv')
