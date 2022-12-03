@@ -1,3 +1,4 @@
+pip install optuna
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -15,6 +16,7 @@ from sklearn.metrics import accuracy_score, f1_score
 
 
 # XGBoost ==============================
+pip install xgboost
 from xgboost import XGBClassifier
 np.set_printoptions(precision=3)
 warnings.simplefilter('ignore')
@@ -103,6 +105,8 @@ def top_n_accuracy(preds, truths, n, class_names):
 # XGBoost =========================================
 # Model and DataFrame construction ========================
 df_plain = pd.read_csv('PATH_TO_DATAFRAME_2005')
+df = df_plain
+
 '''
 This dataframe has 5 columns which are 'urbin','b2','b3','b4', and 'b5' sequentially. 
 First column, 'urbin', contained the binary land cover type which are U and NU from the ground truth data. 
