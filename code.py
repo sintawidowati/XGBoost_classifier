@@ -109,7 +109,7 @@ df = df_plain
 
 '''
 This dataframe has 5 columns which are 'urbin','b2','b3','b4', and 'b5' sequentially. 
-First column, 'urbin', contained the binary land cover type which are U and NU from the ground truth data. 
+First column, 'urbin', contained the land cover type U and NU from the ground truth data that is converted to binary code (0) for class NU and (1) for class U. 
 The next 4 columns contained the DNs of each pixel in band 2, band 3, band 4, and band 5 extracted from LANDSAT 5TM 2005. 
 '''
 
