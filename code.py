@@ -181,19 +181,21 @@ save_result(cv_results, class_names, eval)
 df_classifull2005bin = pd.DataFrame(pd.np.column_stack([cv_results, df_plain]))
 df_classifull2005bin.columns = ['id', 'obs', 'pred', 'U_prob', 'NU_prob',  'keyid', 'cellid', 'gt', 'urbin','bqa','b2', 'b3', 'b4', 'b5']
 df_classifull2005bin.to_csv('df_classifull2005bin.csv')
+
 '''
 We concatenated the main dataframe and predicted result to check the accuracy performance for each pixel as shown in code line 197
 '''
 
 
 # XGB Best_model_training ========================
+import math
 mean_best_params = {name: param for name, param in zip(param_names[0], np.mean(test_params_memory, axis=0))}
 best_xgboost = XGBClassifier(
     objective = 'binary:logistic',
     random_state=42,
-    n_estimators= int(mean_best_params['n_estimators']),
-    max_depth=int(mean_best_params['max_depth']),
-    min_child_weight=int(mean_best_params['min_child_weight']),
+    n_estimators= int(math.ceil(mean_best_params['n_estimators'])),
+    max_depth=int(math.ceil(mean_best_params['max_depth'])),
+    min_child_weight=int(math.ceil(mean_best_params['min_child_weight'])),
     subsample=mean_best_params['subsample'],
     colsample_bytree=mean_best_params['colsample_bytree'],
 )
@@ -211,6 +213,11 @@ X_test2005 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME2005')
 y_pred2005 = best_xgboost.predict(X_test2005)
 y_pred2005smx = best_xgboost.predict_proba(X_test2005)
 
+'''
+The dataframe for prediction has 4 columns which are 'b2','b3','b4', and 'b5' sequentially. 
+They are the normalized DNs of each pixel in band 2, band 3, band 4, and band 5 extracted from LANDSAT 5TM 2005. 
+'''
+
 
 #for 2005 prediction with best model
 df_pred2005ori = pd.DataFrame(pd.np.column_stack([y_pred2005, y_pred2005smx, X_test2005]))
@@ -222,6 +229,11 @@ X_test1999 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME1999')
 y_pred1999 = best_xgboost.predict(X_test1999)
 y_pred1999smx = best_xgboost.predict_proba(X_test1999)
 
+'''
+The dataframe for prediction has 4 columns which are 'b2','b3','b4', and 'b5' sequentially. 
+They are the normalized DNs of each pixel in band 2, band 3, band 4, and band 5 extracted from LANDSAT 5TM 1999. 
+'''
+
 
 #for 1999 prediction with best model
 df_pred1999ori = pd.DataFrame(pd.np.column_stack([y_pred1999, y_pred1999smx, X_test1999]))
@@ -232,6 +244,11 @@ df_pred1999ori.to_csv('df_pred1999ori.csv')
 X_test2011 = pd.read_csv('PATH_TO_UNKNOWN_DATAFRAME2011')
 y_pred2011 = best_xgboost.predict(X_test2011)
 y_pred2011smx = best_xgboost.predict_proba(X_test2011)
+
+'''
+The dataframe for prediction has 4 columns which are 'b2','b3','b4', and 'b5' sequentially. 
+They are the normalized DNs of each pixel in band 2, band 3, band 4, and band 5 extracted from LANDSAT 5TM 2011. 
+'''
 
 
 #for 2011 prediction with best model
